@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cointinuum</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+
+        <h1>Cointinuum</h1>
+
+        <p>Thanks for choosing Cointinuum to help you solve your transportation needs.</p>
+
+        <h2>Configure Vehicle</h2>
+
+        <label for="carColor" class="col-lg-2 control-label">Car Color</label>
+        <select id="carColor">
+          <option value="1">Fire Truck Red</option>
+          <option value="2">Bulldozer Yellow</option>
+          <option value="3">Whatever is left in the bin</option>
+        </select>
+
+        color picker here.
+
+        <h2>Select account for payment</h2>
+
+        <p><span id="loadAccounts_1">Load accounts</span></p>
+
+        <select id="accountlist"></select>
+
+        <button id="loadAccounts">Load accounts</button>
+
+
+
+
+        <h1>Coursetro Instructor</h1>
+
+        <h2 id="instructor"></h2>
+
+        <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif">
+
+        <label for="name" class="col-lg-2 control-label">Instructor Name</label>
+        <input id="name" type="text">
+
+        <label for="name" class="col-lg-2 control-label">Instructor Age</label>
+        <input id="age" type="text">
+
+        <button id="button">Update Instructor</button>
+
+        <div class="logconsole">
+
+          testmessage
+
+        </div>
+
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+
+      if (typeof web3 !== 'undefined') {
+          web3 = new Web3(web3.currentProvider);
+      } else {
+          // set the provider you want from Web3.providers
+          web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+      }
+
+      web3.eth.defaultAccount = web3.eth.accounts[0];
+
+      var CoursetroContract = web3.eth.contract([ { "constant": false, "inputs": [ {
+    "name": "_fName", "type": "string" }, { "name": "_age", "type": "uint256" } ],
+    "name": "setInstructor", "outputs": [], "payable": false, "stateMutability":
+    "nonpayable", "type": "function" }, { "constant": true, "inputs": [],
+    "name": "getInstructor", "outputs": [ { "name": "", "type": "string" }, {
+    "name": "", "type": "uint256" } ], "payable": false, "stateMutability":
+    "view", "type": "function" }, { "anonymous": false, "inputs": [ { "indexed":
+    false, "name": "name", "type": "string" }, { "indexed": false, "name":
+    "age", "type": "uint256" } ], "name": "Instructor", "type": "event" } ]);
+
+      var Coursetro = CoursetroContract.at('0x8dd01e8765b9fc7f4deecc912f69eb23d1b7a253');
+
+      var instructorEvent = Coursetro.Instructor();
+
+      instructorEvent.watch(function(error, result) {
+        if(!error) {
+          $("#loader").hide();
+          $("#instructor").html(result.args.name + ' (' + result.args.age + ' years old)');
+        } else {
+          $("#loader").hide();
+          console.log(error);
+        }
+      } );
+
+      $("#button").click(function() {
+        $("#loader").show();
+        Coursetro.setInstructor($("#name").val(), $("#age").val());
+      });
+
+
+      //-----------------------------------
+
+      // shorthand for $(document).ready()
+      // this will run once when the DOM is ready for javascript code to execute
+      $(function() {
+        fillAccountSelect();
+      });
+
+
+      $("#loadAccounts_1").click(function() {
+        fillAccountSelect();
+      });
+
+      $("#loadAccounts").click(function() {
+        fillAccountSelect();
+      });
+
+
+      function fillAccountSelect() {
+        for(var i = 0; i < web3.eth.accounts.length; i++ ) {
+          $("#accountlist").append(new Option(web3.eth.accounts[i], web3.eth.accounts[i], true, true));
+        }
+      }
+
+    </script>
+
+</body>
+</html>

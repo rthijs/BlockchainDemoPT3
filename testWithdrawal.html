@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+</head>
+<body>
+  <div class="container">
+
+    <h1>TestWithdrawal</h1>
+
+    <p>Walletadres: <b><span id="walletAddress">...</span></b>.</p>
+
+    <p>Contract balance: <span id="balanceContract">...</span></p>
+    <p>Wallet balance: <span id="balanceWallet">...</span></p>
+    <p>Gas estimate: <span id="estimate">...</span></p>
+
+    <p><a href="#" id="estimateGas">estimate gas</a></p>
+    <p><a href="#" id="withdraw">withdrawal</a></p>
+
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+  <script>
+
+    if (typeof web3 !== 'undefined') {
+        web3 = new Web3(web3.currentProvider);
+    } else {
+        // set the provider you want from Web3.providers
+        web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+    }
+
+    var WithdrawalContract = web3.eth.contract([
+    	{
+    		"constant": true,
+    		"inputs": [],
+    		"name": "getContractEtherBalance",
+    		"outputs": [
+    			{
+    				"name": "",
+    				"type": "uint256"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "view",
+    		"type": "function"
+    	},
+    	{
+    		"constant": false,
+    		"inputs": [],
+    		"name": "withdraw",
+    		"outputs": [
+    			{
+    				"name": "",
+    				"type": "bool"
+    			}
+    		],
+    		"payable": false,
+    		"stateMutability": "nonpayable",
+    		"type": "function"
+    	},
+    	{
+    		"inputs": [],
+    		"payable": true,
+    		"stateMutability": "payable",
+    		"type": "constructor"
+    	}
+    ]);
+
+    var Withdrawal = WithdrawalContract.at('0xed4107cad8febad23a474e6458eb2ee16d210686');
+
+    $(function() {
+      web3.eth.defaultAccount = web3.eth.accounts[0];
+      $("#walletAddress").html(web3.eth.defaultAccount);
+      showBalances();
+    });
+
+    $("#estimateGas").click(function() {
+      var estimate = 0; //I can't get this to work
+      $("#estimate").html(estimate);
+    });
+
+    $("#withdraw").click(function() {
+      Withdrawal.withdraw();
+      showBalances();
+    });
+
+    function showBalances() {
+      $("#balanceContract").html(web3.eth.getBalance(Withdrawal.address).toString(10)/1000000000000000000);
+      $("#balanceWallet").html(web3.eth.getBalance(web3.eth.defaultAccount).toString(10)/1000000000000000000);
+    }
+
+  </script>
+</body>
+</html>

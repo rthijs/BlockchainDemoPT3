@@ -1,0 +1,59 @@
+body {
+    background-color:#F0F0F0;
+    padding: 2em;
+    font-family: 'Raleway','Source Sans Pro', 'Arial';
+}
+.container {
+    width: 75%;
+    margin: 0 auto;
+}
+label {
+    display:block;
+    margin-bottom:10px;
+}
+input {
+    padding:10px;
+    width: 50%;
+    margin-bottom: 1em;
+}
+button {
+    margin: 2em 0;
+    padding: 1em 4em;
+    display:block;
+}
+
+table {
+    text-align: center;
+}
+
+#instructor {
+    padding:1em;
+    background-color:#fff;
+    margin: 1em 0;
+}
+
+#loader {
+    width: 100px;
+    display:none;
+}
+
+.logconsole {
+  background-color: #555555;
+  padding: 1em;
+}
+
+.errorBox {
+  background-color: #ff9696;
+  border-width: 1px;
+  border-color: #ff0000;
+  color: #772f2f;
+  padding: 1em 4em;
+}
+
+.infoBox {
+  background-color: #96ffff;
+  border-width: 1px;
+  border-color: #00ffff;
+  color: #2f7777;
+  padding: 1em 4em;
+}

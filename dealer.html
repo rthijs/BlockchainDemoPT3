@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cointinuum</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+</head>
+<body>
+  <div class="container">
+
+    <h1>Cartinuum Backend</h1>
+
+    <p>Wallet: <b><span id="walletAddress">...</span> (<span id="walletBalance">...</span> ETH)</b>.</p>
+
+    <p>Ether geblokkeerd in contract tot oplevering voertuig: <b><span id="weiLockedAmount">...</span></b> ETH.</p>
+
+    <p id="eventInfo"></p>
+
+    <div id="withDrawContainer">
+
+    </div>
+
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="scripts/config.js"></script>
+  <script src="scripts/contractAddresses.js"></script>
+  <script src="scripts/carDealer.js"></script>
+
+  <script>
+
+    $(function() {
+
+      function showWalletAddress() {
+        $("#walletAddress").html(web3.eth.defaultAccount);
+      }
+
+      //for the demo we will use this address as the dealers wallet address
+      web3.eth.defaultAccount = web3.eth.accounts[0];
+
+      showWalletAddress();
+      showWalletBalance();
+      showContractBalance();
+    });
+
+    function orderRecieved(result) {
+      $("#eventInfo").html("Bestelling ontvangen voor <b>" + result.args._clientAddress + "</b>.");
+      showWalletBalance();
+      showContractBalance();
+    };
+
+    function showWalletBalance() {
+      var balance = web3.eth.getBalance(web3.eth.defaultAccount).toString(10)/1000000000000000000;
+      $("#walletBalance").html(balance);
+    }
+
+    function showContractBalance() {
+      console.log(CarDealer.address)
+      var balance = web3.eth.getBalance(CarDealer.address).toString(10)/1000000000000000000;
+      console.log(balance);
+      $("#weiLockedAmount").html(balance);
+    }
+
+  </script>
+</body>
+</html>

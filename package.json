@@ -1,0 +1,14 @@
+{
+  "name": "cointinuum",
+  "version": "1.0.0",
+  "description": "blockchain demo part 3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Roel Thijs",
+  "license": "ISC",
+  "dependencies": {
+    "web3": "github:ethereum/web3.js"
+  }
+}

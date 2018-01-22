@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cointinuum</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="scripts/contractAddresses.js"></script>
+    <script src="scripts/carDealer.js"></script>
+
+  <script>
+
+  window.addEventListener('load', function() {
+
+    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+    if (typeof web3 !== 'undefined') {
+      // Use Mist/MetaMask's provider
+      window.web3 = new Web3(web3.currentProvider);
+    } else {
+      console.log('No web3? You should consider trying MetaMask!')
+      // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
+      window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+    }
+
+    // Now you can start your app & access web3 freely:
+    startApp();
+  });
+
+  function startApp() {
+    $("#logging").hide();
+    getCoinbaseAndBalance();
+    showTotalPrice();
+  }
+
+  function getCoinbaseAndBalance() {
+    web3.eth.getCoinbase(function(error, result) {
+      $("#walletAddress").html(result);
+      if(!error) {
+        getBalance(result);
+      } else {
+        console.log(error);
+      }
+    });
+  }
+
+  function getAddress(){
+
+  }
+
+  function getBalance(address) {
+    web3.eth.getBalance(address, function(error, result) {
+      if(!error) {
+        $("#walletBalance").html(web3.fromWei(result.toString(),'ether'));
+      } else {
+        console.log(error);
+      }
+    });
+  }
+
+  function orderVehicle() {
+    web3.eth.getCoinbase(function(error, result) {
+      $("#walletAddress").html(result);
+      if(!error) {
+        callCarDealerOrderCar(
+          $("#carColor").val(),
+          $("#wheelCount").val(),
+          calculatePrice(),
+          result);
+      } else {
+        console.log(error);
+      }
+    });
+  }
+
+  function callCarDealerOrderCar(color, wheelCount, price, address) {
+
+    console.log("color :" + color);
+    console.log("wheelCount :" + wheelCount);
+    console.log("price :" + price);
+    console.log("from :" + address);
+    console.log("value :" + web3.toWei(price, 'ether'));
+
+      // 1,1,{"from":"0x627306090abab3a6e1400e9345bc60c78a8bef57", "value": "10000000"}
+
+    CarDealer.orderCar(
+      color,
+      wheelCount,
+      {"from": address, "value": web3.toWei(price, 'ether')},
+      function(error, result) {
+        if(!error) {
+          console.log(result);
+        } else {
+          console.log(error);
+        }
+      }
+    );
+  }
+
+  function calculatePrice() {
+    var basePrice = 8;
+    var colorPrice = $("#carColor").val() * .3;
+    var wheelPrice = $("#wheelCount").val() *.12;
+    var total = basePrice + +colorPrice + +wheelPrice;
+    return total.toFixed(2);
+  }
+
+  function showTotalPrice() {
+    $("#prijs").html(calculatePrice());
+  }
+
+  function orderRecieved(result){
+    $("#logging").html("Bestelling goed ontvangen door smart contract.");
+    $("#logging").show();
+    getCoinbaseAndBalance();
+  }
+
+  </script>
+
+</head>
+<body>
+
+  <div class="container">
+
+    <h1>Cartinuum Showroom</h1>
+
+    <p>Bedankt om Cartinuum te kiezen voor uw transportmiddel.</p>
+
+    <h2>Voertuig configureren</h2>
+
+    <table>
+      <tr>
+        <th>Basisprijs</th>
+        <th>Kleur</th>
+        <th>Aantal wielen</th>
+      </tr>
+      <tr>
+        <td>
+          8 ETH
+        </td>
+        <td>
+          <select id="carColor">
+            <option value="3">Sportwagenrood</option>
+            <option value="2">Bulldozergeel</option>
+            <option value="1">Doe maar wat</option>
+          </select>
+        </td>
+        <td>
+          <select id="wheelCount">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+
+    <p>Prijs zoals geconfigureerd: <b><span id="prijs">...</span> ETH</b>.
+
+    <div id="logging" class="infoBox"></div>
+
+    <button id="orderVehicle">Bestel voertuig</button>
+
+    <p>Uw walletadres is: <b><span id="walletAddress">...</span></b>.</p>
+
+    <p>Bedrag beschikbaar: <b><span id="walletBalance">...</span> ETH</b>.</p>
+
+  </div>
+
+  <script>
+
+    $("#orderVehicle").click(function() {
+      orderVehicle();
+    });
+
+    $("#carColor").change(function() {
+      showTotalPrice();
+    });
+
+    $("#wheelCount").change(function() {
+      showTotalPrice();
+    });
+
+  </script>
+
+</body>
+</html>

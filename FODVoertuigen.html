@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cointinuum</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+
+        <h1>FOD Voertuigen</h1>
+
+        <div class="errorBox" id="errorBox">
+          <p>Wacht aub tot de pagina geladen is</p>
+        </div>
+
+        <label for="accountlist" class="col-lg-2 control-label">Selecteer een wallet om te gebruiken voor transacties op deze pagina.</label>
+        <select id="accountlist"></select>
+
+        <h2>Router Smart Contract</h2>
+
+        <p>Het Router Smart Contract (RSC) bevat de adressen van de smart contracts die
+          de verschillende functies bevatten nodig voor het werken met en beheren van
+          voertuigen.<p>
+
+        <p>De eigenaar van het RSC is <b><span id="RSC_owner">...loading...</span></b>.</p>
+
+        <h2>Voertuigtoken Smart Contract</h2>
+
+        <p>Een voertuigtoken wordt aangevraagd door een fabrikant van voertuigen. Dit token
+          geldt als eigendomsbewijs van het voertuig. Het contract met dit adres genereert
+          tokens en bevat de nodige logica om het aan een andere eigenaar toe te wijzen. Dit
+          token is compatibel met de <a href="https://github.com/ethereum/eips/issues/721">ERC721</a>
+           draft standard voor non-fungible tokens.</p>
+
+        <p>Voertuigtoken smart contract adres: <b><span id="VSC_address">..loading...</span></b>.</p>
+
+        <div class="errorBox" id="VSC_errorBox"></div>
+
+        <label for="VSC_newAddress" class="col-lg-2 control-label">Nieuw adres</label>
+        <input id="VSC_newAddress" type="text"></input>
+        <a href="#" id="updateVSCAddress">update</a>
+
+        <h2>Geregistreerde fabrikanten</h2>
+
+        <p>Dit smart contract is een lijst van adressen die een voertuigtoken mogen aanvragen.</p>
+
+        <p>Fabrikanten smart contract adres: <b><span id="GF_address">..loading...</span></b>.</p>
+
+        <div class="errorBox" id="GF_errorBox"></div>
+
+        <label for="GF_newAddress" class="col-lg-2 control-label">Nieuw adres</label>
+        <input id="GF_newAddress" type="text"></input>
+        <a href="#" id="updateGFAddress">update</a>
+
+
+
+
+        </div>
+
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script src="scripts/config.js"></script>
+    <script src="scripts/contractAddresses.js"></script>
+    <script src="scripts/router.js"></script>
+
+    <script>
+
+      // this executes when the page is ready
+      $(function() {
+
+        function fillAccountSelect() {
+          for(var i = 0; i < web3.eth.accounts.length; i++ ) {
+            $("#accountlist").append(new Option(web3.eth.accounts[i], web3.eth.accounts[i], true, true));
+          }
+        }
+
+        fillAccountSelect();
+        web3.eth.defaultAccount = $("#accountlist").val();
+        $(".errorBox").hide();
+        showRouterOwner();
+        showVoertuigTokenAddress();
+        showFabrikantDirectoryAddress();
+      });
+
+      function showRouterOwner() {
+        $("#RSC_owner").html(Router.getOwner());
+      }
+
+      function showVoertuigTokenAddress() {
+        $("#VSC_address").html(Router.getTokenContractAddress());
+      }
+
+      function showVoertuigTokenAddress() {
+        $("#VSC_address").html(Router.getTokenContractAddress());
+      }
+
+      function showFabrikantDirectoryAddress() {
+        $("#GF_address").html(Router.getManufacturerDirectoryAddress());
+      }
+
+      $("#accountlist").change(function() {
+        web3.eth.defaultAccount = $("#accountlist").val();
+      });
+
+      $("#updateVSCAddress").click(function() {
+        updateVSCAddress($("#VSC_newAddress").val(), $("#VSC_errorBox"));
+      });
+
+      $("#updateGFAddress").click(function() {
+        updateGFAddress($("#GF_newAddress").val(), $("#GF_errorBox"));
+      });
+
+    </script>
+</body>
+</html>

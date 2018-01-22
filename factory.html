@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cointinuum</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+</head>
+<body>
+  <div class="container">
+
+    <h1>Fabriek</h1>
+
+    <p>Walletadres: <b><span id="walletAddress">...</span></b>.</p>
+
+    <p>Contractadres: <b><span id="contractAddress">...</span></b>.</p>
+
+    <div id="logging" class="infoBox"></div>
+
+    <p><a href="#" id="clearLogging">wis log</a></p>
+
+    <h2>Opdrachten</h2>
+
+    <p id="buildOrderMessage">Wachten op binnenkomende opdracht...</p>
+
+    <div id="buildOrderDetails">
+
+      <p>Klant : <b><span id="klant">...</span></b></p>
+      <p>Kleur : <b><span id="kleur">...</span></b></p>
+      <p>Aantal wielen : <b><span id="wielen">...</span></b></p>
+
+      <button id="doneButton">Voertuig klaar</button>
+
+    </div>
+
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="scripts/config.js"></script>
+  <script src="scripts/contractAddresses.js"></script>
+  <script src="scripts/carFactory.js"></script>
+
+  <script>
+
+    $(function() {
+
+      function showWalletAddress() {
+        $("#walletAddress").html(web3.eth.defaultAccount);
+      }
+
+      $("#buildOrderDetails").hide();
+
+      //for the demo we will use this address as the factory's wallet address
+      web3.eth.defaultAccount = web3.eth.accounts[0];
+
+      showWalletAddress();
+      $("#contractAddress").html(carFactoryContractAddress);
+      $("#logging").hide();
+      $("#clearLogging").hide();
+    });
+
+    var klant;
+    var kleur;
+    var wielen;
+
+    function setOrderDetails( _klant, _kleur, _wielen) {
+
+      function getColorName(kleur) {
+        switch(kleur) {
+          case 1:
+            return "pak maar wat";
+            break;
+          case 2:
+            return "Geel";
+            break;
+          case 3:
+            return "Rood";
+            break;
+          default:
+            return "invalide";
+        }
+      }
+
+      klant = _klant;
+      kleur = _kleur;
+      wielen = _wielen;
+
+      $("#klant").html(klant);
+      $("#kleur").html(getColorName(kleur));
+      $("#wielen").html(wielen);
+
+      $("#buildOrderMessage").hide();
+      $("#buildOrderDetails").show();
+    }
+
+    function logMessage(_message) {
+      var messages = $("#logging").html() + "<br />" + _message;
+      $("#logging").html(messages);
+      $("#logging").show();
+      $("#clearLogging").show();
+    }
+
+
+    $("#clearLogging").click(function() {
+      $("#logging").html("");
+      $("#logging").hide();
+      $("#clearLogging").hide();
+    });
+
+  </script>
+</body>
+</html>
