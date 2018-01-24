@@ -3,7 +3,7 @@ pragma solidity ^0.4.18; // solhint-disable-line compiler-fixed
 
 contract Dealer {
 
-    function alertCarReady(address _clientAddress) public constant;
+    function alertCarReady() public;
 }
 
 
@@ -67,9 +67,9 @@ contract CarFactory {
         serialNumber++;
     }
 
-    function carIsReady(address _clientAddress) public constant onlyOwner {
+    function carIsReady() public onlyOwner {
         Dealer dealerContract = Dealer(dealer);
-        dealerContract.alertCarReady(_clientAddress);
+        dealerContract.alertCarReady();
     }
 
     function requestToken(uint8 _color, uint8 _wheels, uint32 _serialNumber, address _client) private returns (uint) {

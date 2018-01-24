@@ -30,7 +30,7 @@ contract CarDealer {
 
     event FactoryAddressChanged(address _old, address _new);
     event OrderRecieved(uint8 _colorCode, uint8 _wheelCount, address _clientAddress);
-    event CarReady(address _clientAddress);
+    event CarReady();
 
     function setFactoryAddress(address _address) public onlyOwner {
         address oldAddress = factoryAddress;
@@ -52,8 +52,8 @@ contract CarDealer {
         factory.buildCar(_colorCode, _wheelCount, msg.sender);
     }
 
-    function alertCarReady(address _clientAddress) public {
-        CarReady(_clientAddress);
+    function alertCarReady() public {
+        CarReady();
     }
 
     function getContractEtherBalance() public constant returns (uint) {
