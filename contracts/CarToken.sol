@@ -1,132 +1,90 @@
 pragma solidity ^0.4.18; // solhint-disable-line compiler-fixed
 
 
-// based on the 721 proposal: https://github.com/ethereum/eips/issues/721
-// also this: https://medium.com/crypto-currently/the-anatomy-of-erc721-e9db77abfc24
-contract ERC721 {
-    // ERC20 compatibility
-    function name() public constant returns (string tokenName);
-    function symbol() public constant returns (string tokenSymbol);
-    function totalSupply() public view returns (uint256 total);
-    function balanceOf(address _owner) public constant returns (uint balance);
-    // basic ownership
-    function ownerOf(uint256 _tokenId) public constant returns (address owner);
-    function approve(address _to, uint256 _tokenId) public;
-    function takeOwnership(uint256 _tokenId) public;
-    function transfer(address _to, uint256 _tokenId) public;
-    function tokenOfOwnerByIndex(address _owner, uint256 _index) public constant returns (uint tokenId);
-    // NFT Metadata
-    function tokenMetadata(uint256 _tokenId) public constant returns (string infoUrl);
+contract Router {
 
-    // Events
-    event TransferEvent(address from, address to, uint256 tokenId);
-    event ApprovalEvent(address owner, address approved, uint256 tokenId);
+    function getManufacturerDirectoryAddress() public constant returns (address);
 }
 
 
-contract Cointinuum is ERC721 {
+contract ManufacturerDirectory {
 
-    string private tokenName = "Cointinuum";
-    string private tokenSymbol = "XCT";
+    function isManufacturer(address _address) public constant returns (bool);
+}
+
+
+contract CarToken {
+
     address private owner;
+    address private routerContractAddress;
 
-    struct ContinuCar {
-        uint8 colourCode;
+    struct Token {
+        uint8 color;
+        uint8 wheels;
+        uint32 serialNumber;
+        address manufacturer;
     }
 
-    ContinuCar[] private cars;
+    Token[] private tokens; //all tokens in existence
 
-    mapping(address => uint) private balances;
-    mapping(uint256 => address) private tokenOwners;
-    mapping(uint256 => bool) private tokenExists;
-    mapping(address => mapping (address => uint256)) private allowed;
-    mapping(address => mapping(uint256 => uint256)) private ownerTokens;
-    mapping(uint256 => string) private tokenLinks;
+    mapping (uint256 => address) public tokenIndexToOwner;
+    mapping (address => uint256[]) private addressToTokenIndex;
 
-    function Cointinuum() public {
-        owner = msg.sender;
-    }
+    event TokenCreated(uint256 _tokenId, address _manufacturer, uint32 serialNumber);
 
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
 
-    function name() public constant returns (string) {
-        return tokenName;
+    modifier onlyManufacturer {
+        Router routerContract = Router(routerContractAddress);
+        address manufacturerDirectoryAddress = routerContract.getManufacturerDirectoryAddress();
+        ManufacturerDirectory manufacturerDirectoryContract = ManufacturerDirectory(manufacturerDirectoryAddress);
+        require(manufacturerDirectoryContract.isManufacturer(msg.sender));
+        _;
     }
 
-    function symbol() public constant returns (string) {
-        return tokenSymbol;
+    function CarToken() public {
+        owner = msg.sender;
     }
 
-    function totalSupply() public view returns (uint256) {
-        return cars.length - 1;
+    function setRouterContractAddress(address _newAddress) public onlyOwner {
+        routerContractAddress = _newAddress;
     }
 
-    function balanceOf(address _owner) public constant returns (uint balance) {
-        return balances[_owner];
+    function getRouterContractAddress() public constant returns(address) {
+        return routerContractAddress;
     }
 
-    function ownerOf(uint256 _tokenId) public constant returns (address) {
-        require(tokenExists[_tokenId]);
-        return tokenOwners[_tokenId];
+    function createToken( uint8 _color, uint8 _wheels, uint32 _serialNumber, address _client)
+    public onlyManufacturer returns (uint) {
+
+        Token memory _token = Token({
+            color: _color,
+            wheels: _wheels,
+            serialNumber: _serialNumber,
+            manufacturer: msg.sender
+        });
+
+        uint newTokenId = tokens.push(_token) - 1;
+
+        tokenIndexToOwner[newTokenId] = _client;
+        addressToTokenIndex[_client].push(newTokenId);
+
+        TokenCreated(newTokenId, msg.sender, _serialNumber);
+
+        return newTokenId;
     }
 
-    function approve(address _to, uint256 _tokenId) public {
-        require(msg.sender == ownerOf(_tokenId));
-        require(msg.sender != _to);
-
-        allowed[msg.sender][_to] = _tokenId;
-        ApprovalEvent(msg.sender, _to, _tokenId);
+    function getTokensForOwner(address _owner) public onlyOwner constant returns (uint[]) {
+        return addressToTokenIndex[_owner];
     }
 
-    function takeOwnership(uint256 _tokenId) public {
-        require(tokenExists[_tokenId]);
-
-        address oldOwner = ownerOf(_tokenId);
-        address newOwner = msg.sender;
-
-        require(newOwner != oldOwner);
-
-        require(allowed[oldOwner][newOwner] == _tokenId);
-        balances[oldOwner] -= 1;
-        tokenOwners[_tokenId] = newOwner;
-
-        balances[newOwner] += 1;
-        TransferEvent(oldOwner, newOwner, _tokenId);
+    function getTokenInfo(uint _tokenId) public onlyOwner constant returns (uint8, uint8, uint32, address) {
+        return (tokens[_tokenId].color,
+                tokens[_tokenId].wheels,
+                tokens[_tokenId].serialNumber,
+                tokens[_tokenId].manufacturer);
     }
-
-    function transfer(address _to, uint256 _tokenId) public {
-        address currentOwner = msg.sender;
-        address newOwner = _to;
-
-        require(tokenExists[_tokenId]);
-
-        require(currentOwner == ownerOf(_tokenId));
-        require(currentOwner != newOwner);
-        require(newOwner != address(0));
-        removeFromTokenList(currentOwner, _tokenId);
-
-        balances[currentOwner] -= 1;
-        tokenOwners[_tokenId] = newOwner;
-
-        balances[newOwner] += 1;
-        TransferEvent(currentOwner, newOwner, _tokenId);
-    }
-
-    function tokenOfOwnerByIndex(address _owner, uint256 _index) public constant returns (uint tokenId) {
-        return ownerTokens[_owner][_index];
-    }
-
-    function tokenMetadata(uint256 _tokenId) public constant returns (string infoUrl) {
-        return tokenLinks[_tokenId];
-    }
-
-    function removeFromTokenList(address _owner, uint256 _tokenId) private {
-        for (uint256 i = 0; ownerTokens[_owner][i] != _tokenId; i++) {
-            ownerTokens[_owner][i] = 0;
-        }
-    }
-
 }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Cointinuum</title>
+    <title>Dealer Backend</title>
 
     <link rel="stylesheet" type="text/css" href="main.css">
 
@@ -23,7 +23,7 @@
     <p id="eventInfo"></p>
 
     <div id="withDrawContainer">
-
+      <button id="withDrawButton">Withdraw</button>
     </div>
 
   </div>
@@ -47,6 +47,7 @@
       showWalletAddress();
       showWalletBalance();
       showContractBalance();
+      $("#withDrawContainer").hide();
     });
 
     function orderRecieved(result) {
@@ -61,11 +62,25 @@
     }
 
     function showContractBalance() {
-      console.log(CarDealer.address)
       var balance = web3.eth.getBalance(CarDealer.address).toString(10)/1000000000000000000;
       console.log(balance);
       $("#weiLockedAmount").html(balance);
     }
+
+    function carReady() {
+      $("#eventInfo").html("voertuig klaar");
+      $("#withDrawContainer").show();
+      showWalletBalance();
+      showContractBalance();
+    }
+
+    $("#withDrawButton").click(function() {
+      CarDealer.withdraw();
+      showWalletBalance();
+      showContractBalance();
+      $("#withDrawContainer").hide();
+      $("#eventInfo").html("");
+    });
 
   </script>
 </body>

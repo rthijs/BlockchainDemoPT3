@@ -19,14 +19,14 @@ contract Router {
 }
 
 
-contract CointinuumRouter is Router {
+contract CarRouter is Router {
 
     address private owner;
     address private tokenContractAddress = 0xaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa;
     address private manufacturerDirectoryAddress = 0xaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa;
 
     // constructor
-    function CointinuumRouter() public {
+    function CarRouter() public {
         owner = msg.sender;
     }
 

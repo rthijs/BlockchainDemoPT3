@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Cointinuum</title>
+    <title>Fabriek</title>
 
     <link rel="stylesheet" type="text/css" href="main.css">
 
@@ -105,12 +105,21 @@
       $("#clearLogging").show();
     }
 
-
     $("#clearLogging").click(function() {
       $("#logging").html("");
       $("#logging").hide();
       $("#clearLogging").hide();
     });
+
+
+
+    $("#doneButton").click(function() {
+      setOrderDetails("", "", "");
+      $("#buildOrderDetails").hide();
+      console.log("carIsReady klant: " + klant)
+      CarFactory.carIsReady();
+    });
+
 
   </script>
 </body>

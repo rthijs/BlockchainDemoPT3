@@ -9,7 +9,7 @@ contract Dealer {
 
 contract CarToken {
 
-    function requestToken(address _clientAddress) public returns (uint);
+    function createToken( uint8 _color, uint8 _wheels, uint32 _serialNumber, address _client) public returns (uint);
 }
 
 
@@ -24,6 +24,8 @@ contract CarFactory {
     address private owner;
     address private dealer;
     address private router;
+
+    uint32 private serialNumber = 1;
 
     function CarFactory() public {
         owner = msg.sender;
@@ -61,6 +63,8 @@ contract CarFactory {
 
     function buildCar(uint8 _colorCode, uint8 _wheelCount, address _clientAddress) public onlyDealer {
         BuildOrderRecieved(_colorCode, _wheelCount, _clientAddress);
+        requestToken(_colorCode, _wheelCount, serialNumber, _clientAddress);
+        serialNumber++;
     }
 
     function carIsReady(address _clientAddress) public constant onlyOwner {
@@ -68,11 +72,11 @@ contract CarFactory {
         dealerContract.alertCarReady(_clientAddress);
     }
 
-    function requestToken(address _clientAddress) private returns (uint) {
+    function requestToken(uint8 _color, uint8 _wheels, uint32 _serialNumber, address _client) private returns (uint) {
         Router routerContract = Router(router);
         address carTokenContractAddress = routerContract.getTokenContractAddress();
         CarToken token = CarToken(carTokenContractAddress);
-        uint tokenId = token.requestToken(_clientAddress);
+        uint tokenId = token.createToken(_color, _wheels, _serialNumber, _client);
         return tokenId;
     }
 }

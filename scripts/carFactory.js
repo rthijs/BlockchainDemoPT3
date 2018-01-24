@@ -28,20 +28,6 @@ var CarFactoryContract = web3.eth.contract([
 		"type": "function"
 	},
 	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "_clientAddress",
-				"type": "address"
-			}
-		],
-		"name": "carIsReady",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -92,6 +78,15 @@ var CarFactoryContract = web3.eth.contract([
 			}
 		],
 		"name": "buildCar",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "carIsReady",
 		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",

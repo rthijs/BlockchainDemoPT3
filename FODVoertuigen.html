@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Cointinuum</title>
+    <title>FOD</title>
 
     <link rel="stylesheet" type="text/css" href="main.css">
 
@@ -35,9 +35,7 @@
 
         <p>Een voertuigtoken wordt aangevraagd door een fabrikant van voertuigen. Dit token
           geldt als eigendomsbewijs van het voertuig. Het contract met dit adres genereert
-          tokens en bevat de nodige logica om het aan een andere eigenaar toe te wijzen. Dit
-          token is compatibel met de <a href="https://github.com/ethereum/eips/issues/721">ERC721</a>
-           draft standard voor non-fungible tokens.</p>
+          tokens.</p>
 
         <p>Voertuigtoken smart contract adres: <b><span id="VSC_address">..loading...</span></b>.</p>
 
@@ -59,8 +57,43 @@
         <input id="GF_newAddress" type="text"></input>
         <a href="#" id="updateGFAddress">update</a>
 
+        <div class="infoBox" id="tokenInfo">
+          <h2>Token gegenereerd</h2>
 
+          <p>
+            <b>Token ID: </b><span id="infoTokenId">...</span><br />
+            <b>Manufacturer: </b><span id="infoManufacturer">...</span><br />
+            <b>Serial Number: </b><span id="infoSerialNumber">...</span>
+        </div>
 
+        <h2>Zoek eigenaar</h2>
+
+        <label for="zoekEigenaar_tokenId" class="col-lg-2 control-label">Token ID</label>
+        <input id="zoekEigenaar_tokenId" type="text"></input>
+        <a href="#zoekEigenaar" id="zoekEigenaar">Zoek</a>
+
+        <p id="zoekEigenaarResult">...</p>
+
+        <h2>Zoek voertuigen</h2>
+
+        <label for="zoekvoertuig_adres" class="col-lg-2 control-label">Adres eigenaar</label>
+        <input id="zoekvoertuig_adres" type="text"></input>
+        <a href="#zoekVoertuigen" id="zoekVoertuigen">Zoek</a>
+
+        <p id="zoekVoertuigenResult">...</p>
+
+        <h2>Voertuig details</h2>
+
+        <label for="zoekvoertuig_details" class="col-lg-2 control-label">token ID</label>
+        <input id="zoekvoertuig_details" type="text"></input>
+        <a href="#zoekDetails" id="zoekDetails">Zoek</a>
+
+        <p>
+          <b>Kleur: </b><span id="detail_color">...</span><br />
+          <b>Aantal wielen: </b><span id="detail_wheels">...</span><br />
+          <b>Serienummer: </b><span id="detail_serialNumber">...</span><br />
+          <b>Fabrikant: </b><span id="detail_manufacturer">...</span>
+        </p>
 
         </div>
 
@@ -72,6 +105,7 @@
     <script src="scripts/config.js"></script>
     <script src="scripts/contractAddresses.js"></script>
     <script src="scripts/router.js"></script>
+    <script src="scripts/token.js"></script>
 
     <script>
 
@@ -118,6 +152,30 @@
 
       $("#updateGFAddress").click(function() {
         updateGFAddress($("#GF_newAddress").val(), $("#GF_errorBox"));
+      });
+
+      function handleTokenCreatedEvent(tokenId, manufacturer, serialNumber) {
+        $("#infoTokenId").html(tokenId.toString());
+        $("#infoManufacturer").html(manufacturer);
+        $("#infoSerialNumber").html(serialNumber.toString());
+      }
+
+      $("#zoekDetails").click(function() {
+        var details = getTokenInfo($("#zoekvoertuig_details").val());
+        $("#detail_color").html(details[0].toString());
+        $("#detail_wheels").html(details[1].toString());
+        $("#detail_serialNumber").html(details[2].toString());
+        $("#detail_manufacturer").html(details[3].toString());
+      });
+
+      $("#zoekVoertuigen").click(function() {
+        var voertuigen = getTokensForOwner($("#zoekvoertuig_adres").val());
+        $("#zoekVoertuigenResult").html("Voertuigen: " + voertuigen.toString());
+      });
+
+      $("#zoekEigenaar").click(function() {
+        var eigenaar = tokenIndexToOwner($("#zoekEigenaar_tokenId").val());
+        $("#zoekEigenaarResult").html("Eigenaar: " + eigenaar);
       });
 
     </script>

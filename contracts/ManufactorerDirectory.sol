@@ -22,7 +22,7 @@ contract ManufacturerDirectory {
     }
 
     function registerManufacturer(address _address) public onlyOwner {
-        uint index = registeredManufacturers.push(_address); //starts at 1?
+        uint index = registeredManufacturers.push(_address);
         manufacturers[_address] = index;
         ManufacturerAdded(_address);
     }

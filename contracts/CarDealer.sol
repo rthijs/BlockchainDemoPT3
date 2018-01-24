@@ -60,11 +60,7 @@ contract CarDealer {
         return this.balance;
     }
 
-    function withdraw() public onlyOwner returns (bool) {
-        if (msg.sender.send(this.balance)) {
-            return true;
-        } else {
-            return false;
-        }
+    function withdraw() public onlyOwner {
+        msg.sender.transfer(this.balance);
     }
 }
